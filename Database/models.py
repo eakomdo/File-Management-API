@@ -3,9 +3,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import func
 from Database.data import Base
 
+
 class Users(Base):
     __tablename__ = "user"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String, nullable=False)
     middle_name = Column(String, nullable=True)
@@ -24,7 +25,7 @@ class Users(Base):
 
 class FileManage(Base):
     __tablename__ = "files"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     filename = Column(String, nullable=False)

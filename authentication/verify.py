@@ -31,11 +31,9 @@ def verify_email(token: str, db: db_dependency):
             <head>
                 <title>Verification Failed</title>
             </head>
-            <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-                <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h1 style="color: #dc3545;">Verification Failed</h1>
-                    <p>The verification link is invalid or has expired.</p>
-                </div>
+            <body>
+                <h1>Verification Failed</h1>
+                <p>The verification link is invalid or has expired.</p>
             </body>
         </html>
         """
@@ -48,11 +46,9 @@ def verify_email(token: str, db: db_dependency):
             <head>
                 <title>User Not Found</title>
             </head>
-            <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-                <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h1 style="color: #dc3545;">User Not Found</h1>
-                    <p>We could not find a user associated with this email.</p>
-                </div>
+            <body>
+                <h1>User Not Found</h1>
+                <p>We could not find a user associated with this email.</p>
             </body>
         </html>
         """
@@ -63,11 +59,9 @@ def verify_email(token: str, db: db_dependency):
             <head>
                 <title>Already Verified</title>
             </head>
-            <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-                <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h1 style="color: #0275d8;">Already Verified</h1>
-                    <p>Your email has already been verified. You can proceed to login.</p>
-                </div>
+            <body>
+                <h1>Already Verified</h1>
+                <p>Your email has already been verified. You can proceed to login.</p>
             </body>
         </html>
         """
@@ -80,12 +74,10 @@ def verify_email(token: str, db: db_dependency):
         <head>
             <title>Verification Successful</title>
         </head>
-        <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-            <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <h1 style="color: #28a745;">Verification Successful!</h1>
-                <p>Your email has been successfully verified.</p>
-                <p>You can now close this window and log in to your account.</p>
-            </div>
+        <body>
+            <h1>Verification Successful!</h1>
+            <p>Your email has been successfully verified.</p>
+            <p>You can now close this window and log in to your account.</p>
         </body>
     </html>
     """
