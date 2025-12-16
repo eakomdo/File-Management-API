@@ -2,7 +2,7 @@ import os
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import EmailStr
 from dotenv import load_dotenv
-from authentication.token import create_verification_token
+from app.core.security import create_verification_token
 
 load_dotenv()
 
@@ -18,12 +18,11 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=True,
 )
 
-
 async def send_verification_email(email: EmailStr, user_name: str):
     token = create_verification_token(email)
 
     domain = os.getenv("DOMAIN", "localhost:8000")
-    verification_link = f"http://{domain}/verify?token={token}"
+    verification_link = f"http://{domain}/auth/verify?token={token}"
 
     html = f"""
     <!DOCTYPE html>
@@ -215,4 +214,3 @@ async def send_password_reset_email(email: EmailStr, link: str):
 
     fm = FastMail(conf)
     await fm.send_message(message)
-

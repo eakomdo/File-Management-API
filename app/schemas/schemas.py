@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-
 # Registration schema
 class RegisterUser(BaseModel):
     first_name: str
@@ -11,18 +10,15 @@ class RegisterUser(BaseModel):
     password: str
     confirm_password: str
 
-
 # Token schema
 class Token(BaseModel):
     message: str | None = None
     token_type: str
     access_token: str
 
-
 class LoginUser(BaseModel):
     email: str
     password: str
-
 
 class UserResponse(BaseModel):
     first_name: str
@@ -36,23 +32,16 @@ class UserResponse(BaseModel):
 class PasswordReset(BaseModel):
     email: str
 
-    
-
-
 class NewPassword(BaseModel):
     token: str
     new_password: str
     confirm_password: str
 
-
-
 class TokenData(BaseModel):
     username: str | None = None
-
 
 class FileDetail(BaseModel):
     filename: str
     file_type: str
     file_size: int
     uploaded_at: datetime | None = None
-    
