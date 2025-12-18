@@ -43,5 +43,4 @@ class TokenData(BaseModel):
 class FileDetail(BaseModel):
     filename: str
     file_type: str
-    file_size: int
     uploaded_at: datetime | None = None

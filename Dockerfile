@@ -34,10 +34,13 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 USER appuser
 
 # Copy the source code into the container.
-COPY . .
+COPY --chown=appuser:appuser . .
+
+# Ensure the uploaded_files directory exists and is writable by the appuser
+RUN mkdir -p uploaded_files
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
-CMD ["fastapi", "dev", "app/main.py"]
+CMD ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]

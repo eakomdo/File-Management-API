@@ -8,7 +8,11 @@ import os
 from app.api.deps import db_dependency
 from app.models.models import Users
 from app.schemas.schemas import (
-    RegisterUser, LoginUser, Token, PasswordReset, NewPassword
+    RegisterUser,
+    LoginUser,
+    Token,
+    PasswordReset,
+    NewPassword,
 )
 from app.core.security import create_access_token, decode_verification_token
 from app.services.email import send_verification_email, send_password_reset_email
@@ -18,19 +22,22 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-@router.post('/register')
+
+@router.post("/register")
 async def create_user(db: db_dependency, create_user_request: RegisterUser):
     if create_user_request.password != create_user_request.confirm_password:
         return {
             "status": status.HTTP_400_BAD_REQUEST,
-            "message": "Password and Confirm Password do not match"
+            "message": "Password and Confirm Password do not match",
         }
-    
-    existing_user = db.query(Users).filter(Users.email == create_user_request.email).first()
+
+    existing_user = (
+        db.query(Users).filter(Users.email == create_user_request.email).first()
+    )
     if existing_user:
         return {
             "status": status.HTTP_400_BAD_REQUEST,
-            "message": "Email already registered"
+            "message": "Email already registered",
         }
 
     create_user_model = Users(
@@ -38,13 +45,16 @@ async def create_user(db: db_dependency, create_user_request: RegisterUser):
         last_name=create_user_request.last_name,
         middle_name=create_user_request.middle_name,
         email=create_user_request.email,
-        hashed_password = pwd_context.hash(create_user_request.password)
+        hashed_password=pwd_context.hash(create_user_request.password),
     )
     db.add(create_user_model)
     db.commit()
-    
+
     await send_verification_email(create_user_model.email, create_user_model.first_name)
-    return {"message": "User created successfully. Please check your email to verify your account."}
+    return {
+        "message": "User created successfully. Please check your email to verify your account."
+    }
+
 
 @router.post("/login", response_model=Token)
 async def login_user(db: db_dependency, login_request: LoginUser):
@@ -65,6 +75,7 @@ async def login_user(db: db_dependency, login_request: LoginUser):
         "access_token": token,
         "token_type": "bearer",
     }
+
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
@@ -88,13 +99,16 @@ async def login_for_access_token(
         "token_type": "bearer",
     }
 
+
 @router.get("/verify", response_class=HTMLResponse)
 def verify_email(token: str, db: db_dependency):
     try:
         email = decode_verification_token(token)
         if not email:
-             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token payload")
-    except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token payload"
+            )
+    except Exception:
         return """
         <html>
             <head>
@@ -121,9 +135,9 @@ def verify_email(token: str, db: db_dependency):
             </body>
         </html>
         """
-    
+
     if user.is_verified:
-         return """
+        return """
         <html>
             <head>
                 <title>Already Verified</title>
@@ -150,6 +164,7 @@ def verify_email(token: str, db: db_dependency):
     </html>
     """
 
+
 @router.post("/reset_password")
 async def reset_password(email_data: PasswordReset, db: db_dependency):
     user = db.query(Users).filter(Users.email == email_data.email).first()
@@ -169,6 +184,7 @@ async def reset_password(email_data: PasswordReset, db: db_dependency):
     await send_password_reset_email(user.email, link)
 
     return {"message": "Password reset email sent", "token": token}
+
 
 @router.post("/confirm_password_reset")
 async def confirm_password_reset(data: NewPassword, db: db_dependency):

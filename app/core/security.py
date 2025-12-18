@@ -21,7 +21,7 @@ def decode_verification_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:
-            raise HTTPException(status_code=404, detail="Invalid email")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUN, detail="Invalid email")
         return email
     except JWTError:
-        raise HTTPException(status_code=404, detail="Invalid email or token has expired")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid email or token has expired")

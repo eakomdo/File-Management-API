@@ -11,39 +11,72 @@ from app.schemas.schemas import FileDetail
 
 router = APIRouter(prefix="/files", tags=["manage_files"])
 
-@router.post('/upload', status_code=status.HTTP_201_CREATED)
-async def upload_file(db: db_dependency, current_user: Users = Depends(get_current_user), file: UploadFile = File(...)):
+
+@router.post("/upload", status_code=status.HTTP_201_CREATED)
+async def upload_file(
+    db: db_dependency,
+    current_user: Users = Depends(get_current_user),
+    file: UploadFile = File(...),
+):
     upload_dir = "uploaded_files"
     os.makedirs(upload_dir, exist_ok=True)
-    
+
     file_extension = os.path.splitext(file.filename)[1]
     stored_filename = f"{uuid.uuid4()}{file_extension}"
     file_path = os.path.join(upload_dir, stored_filename)
-    
+
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-        
+
     file_size = os.path.getsize(file_path)
-    
+
     new_file = FileManage(
         user_id=current_user.id,
         filename=file.filename,
         stored_filename=stored_filename,
         file_type=file.content_type,
         file_size=file_size,
-        path=file_path
+        path=file_path,
     )
-    
+
     db.add(new_file)
     db.commit()
     db.refresh(new_file)
-    
-    return {"message": "File uploaded successfully", "file_id": new_file.id}
+
+    return {"message": f"'{file.filename}' uploaded successfully"}
+
 
 @router.get("/list", status_code=status.HTTP_200_OK, response_model=list[FileDetail])
-async def list_files(db: db_dependency, current_user: Users = Depends(get_current_user)):
-    files = db.query(FileManage).filter(FileManage.user_id == current_user.id).all()
+async def list_files(
+    db: db_dependency,
+    current_user: Users = Depends(get_current_user),
+    filename: str = None,
+):
+    if filename:
+        files = (
+            db.query(FileManage)
+            .filter(
+                FileManage.user_id == current_user.id,
+                FileManage.filename.ilike(f"%{filename}%"),
+            )
+            .all()
+        )
+        if not files:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="This file cannot be found",
+            )
+        return files
+
+    if not filename:
+        files = db.query(FileManage).filter(FileManage.user_id == current_user.id).all()
+        if not files:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="You have no files uploaded",
+            )
     return files
+
 
 @router.get("/download/{filename}", status_code=status.HTTP_200_OK)
 async def download_file(
@@ -65,7 +98,7 @@ async def download_file(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="File not found on server"
         )
-        
+
     # Increment download count
     file_record.download_count += 1
     db.commit()
@@ -73,6 +106,7 @@ async def download_file(
     return FileResponse(
         path=file_path, filename=file_record.filename, media_type=file_record.file_type
     )
+
 
 @router.delete("/delete/{filename}", status_code=status.HTTP_200_OK)
 async def delete_file(
