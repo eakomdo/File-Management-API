@@ -26,7 +26,7 @@ RUN adduser \
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
 # Leverage a bind mount to requirements.txt to avoid having to copy them into
 # into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,id=file-management-api-pip,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
@@ -43,4 +43,4 @@ RUN mkdir -p uploaded_files
 EXPOSE 8000
 
 # Run the application.
-CMD ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
+CMD ["fastapi", "run", "app/main.py", "--host", "0.0.0.0"]
